@@ -3,8 +3,8 @@ package amqp_connector
 import (
 	"context"
 	"fmt"
-	"github.com/Alliera/logging"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/sandsiv/logging"
 	"sync"
 	"sync/atomic"
 	"time"

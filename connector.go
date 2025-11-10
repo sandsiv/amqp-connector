@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 )
-import "github.com/Alliera/logging"
+import "github.com/sandsiv/logging"
 import amqp "github.com/rabbitmq/amqp091-go"
 
 var logger = logging.NewDefault("RabbitMQ Connector").UnsetFlags(logging.ShortCaller)
