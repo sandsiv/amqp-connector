@@ -15,6 +15,8 @@ const UnlimitedPrefetchCount = -1
 type Connection struct {
 	*amqp.Connection
 	reconnectionDelaySec int
+	heartbeatSec         int
+	readWriteDeadlineSec int
 	qosPrefetchCount     int
 	addr                 string
 }
@@ -26,8 +28,14 @@ type Channel struct {
 	closed          int32
 }
 
-func Dial(ctx context.Context, addr string, reconnectionDelaySec int) (*Connection, error) {
-	connection := &Connection{addr: addr, reconnectionDelaySec: reconnectionDelaySec}
+func Dial(ctx context.Context, addr string, reconnectionDelaySec, heartbeatSec, readWriteDeadlineSec int) (*Connection, error) {
+	connection := &Connection{
+		addr:                 addr,
+		reconnectionDelaySec: reconnectionDelaySec,
+		heartbeatSec:         heartbeatSec,
+		readWriteDeadlineSec: readWriteDeadlineSec,
+	}
+
 	err := connection.establishConnection(ctx)
 	if err == nil {
 		go func() {
