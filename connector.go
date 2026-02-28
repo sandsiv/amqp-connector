@@ -12,13 +12,29 @@ import amqp "github.com/rabbitmq/amqp091-go"
 
 var logger = logging.NewDefault("RabbitMQ Connector").UnsetFlags(logging.ShortCaller)
 
+func (conn *Connection) dial() (*amqp.Connection, error) {
+	config := amqp.Config{}
+
+	config.Heartbeat = time.Duration(conn.heartbeatSec) * time.Second
+
+	if conn.heartbeatSec <= 0 {
+		config.Heartbeat = time.Duration(10) * time.Second
+	}
+
+	if conn.readWriteDeadlineSec > 0 {
+		config.Dial = amqp.DefaultDial(time.Duration(conn.readWriteDeadlineSec) * time.Second)
+	}
+
+	return amqp.DialConfig(conn.addr, config)
+}
+
 func (conn *Connection) establishConnection(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return logging.Trace(ctx.Err())
 		default:
-			connection, err := amqp.Dial(conn.addr)
+			connection, err := conn.dial()
 			if err == nil {
 				logger.Debug("Connection successfully established")
 				conn.Connection = connection
